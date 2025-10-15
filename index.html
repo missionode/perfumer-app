@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfumer's Organ - Digital Fragrance Composer</title>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/wheel.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-content">
+            <h1 class="app-title">
+                <span class="icon">🌸</span>
+                Perfumer's Organ
+            </h1>
+            <div class="header-actions">
+                <button id="themeToggle" class="icon-btn" title="Toggle Dark Mode">
+                    <span class="theme-icon">☀️</span>
+                </button>
+                <button id="settingsBtn" class="icon-btn" title="Settings">
+                    <span>⚙️</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="tab-nav">
+        <button class="tab-btn active" data-tab="dashboard">
+            <span class="tab-icon">📊</span>
+            <span class="tab-label">Dashboard</span>
+        </button>
+        <button class="tab-btn" data-tab="wheel">
+            <span class="tab-icon">🎨</span>
+            <span class="tab-label">Wheel</span>
+        </button>
+        <button class="tab-btn" data-tab="organ">
+            <span class="tab-icon">🧪</span>
+            <span class="tab-label">Organ</span>
+        </button>
+        <button class="tab-btn" data-tab="compose">
+            <span class="tab-icon">✨</span>
+            <span class="tab-label">Compose</span>
+        </button>
+        <button class="tab-btn" data-tab="library">
+            <span class="tab-icon">📚</span>
+            <span class="tab-label">Library</span>
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="app-main">
+        <!-- Dashboard View -->
+        <section id="dashboard" class="view active">
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <h3>Total Ingredients</h3>
+                    <p class="stat-number" id="totalIngredients">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Compositions</h3>
+                    <p class="stat-number" id="totalCompositions">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Inventory Value</h3>
+                    <p class="stat-number" id="inventoryValue">$0.00</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Fragrance Families</h3>
+                    <p class="stat-number" id="fragranceFamilies">0</p>
+                </div>
+            </div>
+
+            <div class="recent-section">
+                <h2>Recent Compositions</h2>
+                <div id="recentCompositions" class="composition-list">
+                    <p class="empty-state">No compositions yet. Start creating in the Compose tab!</p>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <h2>Quick Actions</h2>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="switchTab('compose')">
+                        ✨ New Composition
+                    </button>
+                    <button class="btn btn-secondary" onclick="switchTab('organ')">
+                        🧪 Add Ingredient
+                    </button>
+                    <button class="btn btn-secondary" id="luckyBtn">
+                        🎲 Feeling Lucky
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Fragrance Wheel View -->
+        <section id="wheel" class="view">
+            <div class="wheel-container">
+                <div class="wheel-header">
+                    <h2>Fragrance Wheel Explorer</h2>
+                    <p class="subtitle">Explore fragrance families and their relationships</p>
+                </div>
+                <div id="wheelCanvas" class="wheel-canvas">
+                    <!-- SVG Wheel will be rendered here -->
+                </div>
+                <div id="wheelInfo" class="wheel-info">
+                    <h3>Select a family to explore</h3>
+                    <p>Click on any segment to view details and compatible notes.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ingredient Organ View -->
+        <section id="organ" class="view">
+            <div class="organ-header">
+                <h2>Ingredient Organ</h2>
+                <div class="organ-actions">
+                    <input type="search" id="organSearch" placeholder="Search ingredients..." class="search-input">
+                    <button class="btn btn-primary" id="addIngredientBtn">+ Add Ingredient</button>
+                    <button class="btn btn-secondary" id="importIngredientsBtn">📥 Import</button>
+                    <button class="btn btn-secondary" id="exportIngredientsBtn">📤 Export</button>
+                </div>
+            </div>
+
+            <div class="bulk-actions-bar" id="bulkActionsBar" style="display: none;">
+                <div class="bulk-actions-content">
+                    <span id="selectedCount">0 selected</span>
+                    <div class="bulk-actions-buttons">
+                        <button class="btn btn-small btn-secondary" id="selectAllBtn">Select All</button>
+                        <button class="btn btn-small btn-secondary" id="deselectAllBtn">Deselect All</button>
+                        <button class="btn btn-small" id="bulkDeleteBtn" style="background: var(--error); color: white;">🗑️ Delete Selected</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filters">
+                <select id="familyFilter" class="filter-select">
+                    <option value="">All Families</option>
+                </select>
+                <select id="noteTypeFilter" class="filter-select">
+                    <option value="">All Note Types</option>
+                    <option value="top">Top Notes</option>
+                    <option value="middle">Middle Notes</option>
+                    <option value="base">Base Notes</option>
+                </select>
+                <select id="sortBy" class="filter-select">
+                    <option value="name">Sort by Name</option>
+                    <option value="price">Sort by Price</option>
+                    <option value="intensity">Sort by Intensity</option>
+                    <option value="family">Sort by Family</option>
+                </select>
+            </div>
+
+            <div id="ingredientGrid" class="ingredient-grid">
+                <!-- Ingredients will be rendered here -->
+            </div>
+        </section>
+
+        <!-- Composition Builder View -->
+        <section id="compose" class="view">
+            <div class="compose-layout">
+                <div class="compose-left">
+                    <div class="compose-header">
+                        <h2>Composition Builder</h2>
+                        <input type="text" id="compositionName" placeholder="Untitled Composition" class="composition-name-input">
+                    </div>
+
+                    <div class="mode-toggle">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="measurementMode">
+                            <span class="toggle-switch"></span>
+                            <span class="toggle-text">
+                                <span class="mode-drops">Drops</span>
+                                <span class="mode-ml">ML</span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="formula-builder">
+                        <div class="formula-header">
+                            <h3>Formula</h3>
+                            <button class="btn btn-small" id="addIngredientToFormula">+ Add Ingredient</button>
+                        </div>
+                        <div id="formulaList" class="formula-list">
+                            <p class="empty-state">Add ingredients to start building your composition</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-totals">
+                        <div class="total-row">
+                            <span>Total Amount:</span>
+                            <span id="totalAmount">0 drops</span>
+                        </div>
+                        <div class="total-row">
+                            <span>Total Cost:</span>
+                            <span id="totalCost">$0.00</span>
+                        </div>
+                        <div class="total-row">
+                            <span>Cost per ML:</span>
+                            <span id="costPerMl">$0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="compose-actions">
+                        <button class="btn btn-primary" id="saveComposition">💾 Save Composition</button>
+                        <button class="btn btn-secondary" id="clearComposition">🗑️ Clear</button>
+                        <button class="btn btn-secondary" id="exportComposition">📤 Export</button>
+                    </div>
+                </div>
+
+                <div class="compose-right">
+                    <div class="harmony-panel">
+                        <h3>Harmony Score</h3>
+                        <div class="harmony-score-container">
+                            <div class="harmony-circle">
+                                <span id="harmonyScore">0</span>
+                                <span class="harmony-percent">%</span>
+                            </div>
+                        </div>
+                        <p id="harmonyMessage" class="harmony-message">Add ingredients to calculate harmony</p>
+                    </div>
+
+                    <div class="balance-panel">
+                        <h3>Note Balance</h3>
+                        <div class="pyramid">
+                            <div class="pyramid-row top">
+                                <div class="pyramid-label">Top</div>
+                                <div class="pyramid-bar">
+                                    <div id="topNoteBar" class="pyramid-fill" style="width: 0%"></div>
+                                </div>
+                                <span id="topNotePercent">0%</span>
+                            </div>
+                            <div class="pyramid-row middle">
+                                <div class="pyramid-label">Middle</div>
+                                <div class="pyramid-bar">
+                                    <div id="middleNoteBar" class="pyramid-fill" style="width: 0%"></div>
+                                </div>
+                                <span id="middleNotePercent">0%</span>
+                            </div>
+                            <div class="pyramid-row base">
+                                <div class="pyramid-label">Base</div>
+                                <div class="pyramid-bar">
+                                    <div id="baseNoteBar" class="pyramid-fill" style="width: 0%"></div>
+                                </div>
+                                <span id="baseNotePercent">0%</span>
+                            </div>
+                        </div>
+                        <div class="balance-suggestions" id="balanceSuggestions">
+                            <p class="suggestion-text">Ideal ratios: Top 20-30%, Middle 40-50%, Base 20-30%</p>
+                        </div>
+                    </div>
+
+                    <div class="mini-wheel">
+                        <h3>Composition Wheel</h3>
+                        <div id="miniWheelCanvas" class="mini-wheel-canvas">
+                            <!-- Mini wheel visualization -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Composition Library View -->
+        <section id="library" class="view">
+            <div class="library-header">
+                <h2>Composition Library</h2>
+                <div class="library-actions">
+                    <input type="search" id="librarySearch" placeholder="Search compositions..." class="search-input">
+                    <button class="btn btn-secondary" id="importCompositionsBtn">📥 Import</button>
+                    <button class="btn btn-secondary" id="exportAllCompositionsBtn">📤 Export All</button>
+                </div>
+            </div>
+
+            <div id="compositionLibrary" class="composition-library">
+                <!-- Saved compositions will be rendered here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    <div id="modalOverlay" class="modal-overlay hidden">
+        <!-- Settings Modal -->
+        <div class="modal" id="settingsModal" style="display: none;">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="settingsForm">
+                    <div class="form-group">
+                        <label for="currencySelect">Currency</label>
+                        <select id="currencySelect" class="form-control">
+                            <option value="USD">$ USD - US Dollar</option>
+                            <option value="EUR">€ EUR - Euro</option>
+                            <option value="GBP">£ GBP - British Pound</option>
+                            <option value="JPY">¥ JPY - Japanese Yen</option>
+                            <option value="CNY">¥ CNY - Chinese Yuan</option>
+                            <option value="INR">₹ INR - Indian Rupee</option>
+                            <option value="AUD">$ AUD - Australian Dollar</option>
+                            <option value="CAD">$ CAD - Canadian Dollar</option>
+                            <option value="CHF">Fr CHF - Swiss Franc</option>
+                            <option value="SEK">kr SEK - Swedish Krona</option>
+                            <option value="NOK">kr NOK - Norwegian Krone</option>
+                            <option value="DKK">kr DKK - Danish Krone</option>
+                            <option value="SGD">$ SGD - Singapore Dollar</option>
+                            <option value="HKD">$ HKD - Hong Kong Dollar</option>
+                            <option value="NZD">$ NZD - New Zealand Dollar</option>
+                            <option value="KRW">₩ KRW - South Korean Won</option>
+                            <option value="MXN">$ MXN - Mexican Peso</option>
+                            <option value="BRL">R$ BRL - Brazilian Real</option>
+                            <option value="ZAR">R ZAR - South African Rand</option>
+                            <option value="RUB">₽ RUB - Russian Ruble</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dropsPerMlInput">Drops per ML (Standard: 20)</label>
+                        <input type="number" id="dropsPerMlInput" class="form-control" min="15" max="25" value="20">
+                        <small class="form-text">Adjust based on your dropper type (typically 15-25)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Theme</label>
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <button type="button" class="btn btn-secondary" id="lightThemeBtn">☀️ Light</button>
+                            <button type="button" class="btn btn-secondary" id="darkThemeBtn">🌙 Dark</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Data Management</label>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <button type="button" class="btn btn-secondary" id="exportAllDataBtn">📥 Export All Data</button>
+                            <button type="button" class="btn btn-secondary" id="importAllDataBtn">📤 Import Data</button>
+                            <button type="button" class="btn btn-secondary" id="flushSampleDataBtn" style="color: var(--warning);">🧹 Remove Sample Ingredients</button>
+                            <button type="button" class="btn btn-secondary" id="clearAllDataBtn" style="color: var(--error);">🗑️ Clear All Data</button>
+                        </div>
+                        <small class="form-text">Remove Sample Ingredients will delete only the 20 pre-loaded ingredients. Your custom ingredients will be preserved.</small>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Close</button>
+                        <button type="submit" class="btn btn-primary">Save Settings</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Ingredient Modal -->
+        <div class="modal" id="ingredientModal">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Ingredient</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="ingredientForm">
+                    <div class="form-group">
+                        <label for="ingredientName">Name *</label>
+                        <input type="text" id="ingredientName" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ingredientFamily">Family *</label>
+                            <select id="ingredientFamily" required>
+                                <option value="">Select family</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ingredientSubfamily">Subfamily</label>
+                            <select id="ingredientSubfamily">
+                                <option value="">Select subfamily</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ingredientNoteType">Note Type *</label>
+                            <select id="ingredientNoteType" required>
+                                <option value="">Select type</option>
+                                <option value="top">Top</option>
+                                <option value="middle">Middle</option>
+                                <option value="base">Base</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ingredientIntensity">Intensity (1-10) *</label>
+                            <input type="number" id="ingredientIntensity" min="1" max="10" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ingredientPrice">Price per ML ($) *</label>
+                        <input type="number" id="ingredientPrice" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ingredientSupplier">Supplier</label>
+                        <input type="text" id="ingredientSupplier">
+                    </div>
+                    <div class="form-group">
+                        <label for="ingredientCAS">CAS Number</label>
+                        <input type="text" id="ingredientCAS">
+                    </div>
+                    <div class="form-group">
+                        <label for="ingredientNotes">Notes</label>
+                        <textarea id="ingredientNotes" rows="3"></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Ingredient</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="js/db.js"></script>
+    <script src="js/wheel.js"></script>
+    <script src="js/organ.js"></script>
+    <script src="js/composer.js"></script>
+    <script src="js/lucky.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

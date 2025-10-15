@@ -1,0 +1,251 @@
+{
+  "id": "default",
+  "version": "2.0",
+  "name": "Expanded Fragrance Wheel",
+  "description": "Comprehensive fragrance classification system",
+  "families": [
+    {
+      "id": "floral",
+      "name": "Floral",
+      "color": "#FF69B4",
+      "angle": 0,
+      "description": "Flowery, romantic, and often sweet scents",
+      "subfamilies": [
+        {
+          "id": "white-floral",
+          "name": "White Floral",
+          "notes": ["jasmine", "tuberose", "gardenia", "orange-blossom", "ylang-ylang"],
+          "description": "Rich, creamy white flowers"
+        },
+        {
+          "id": "rose",
+          "name": "Rose",
+          "notes": ["rose-absolute", "rose-otto", "damask-rose", "tea-rose"],
+          "description": "Classic rose varieties"
+        },
+        {
+          "id": "powdery-floral",
+          "name": "Powdery",
+          "notes": ["iris", "violet", "heliotrope", "mimosa"],
+          "description": "Soft, powdery floral scents"
+        }
+      ]
+    },
+    {
+      "id": "fresh",
+      "name": "Fresh",
+      "color": "#00CED1",
+      "angle": 45,
+      "description": "Clean, crisp, and invigorating scents",
+      "subfamilies": [
+        {
+          "id": "citrus",
+          "name": "Citrus",
+          "notes": ["bergamot", "lemon", "orange", "grapefruit", "lime", "mandarin"],
+          "description": "Bright, zesty citrus fruits"
+        },
+        {
+          "id": "aquatic",
+          "name": "Aquatic",
+          "notes": ["calone", "sea-salt", "water-lily", "marine"],
+          "description": "Ocean-inspired watery notes"
+        },
+        {
+          "id": "green",
+          "name": "Green",
+          "notes": ["galbanum", "violet-leaf", "fig-leaf", "tomato-leaf", "cut-grass"],
+          "description": "Fresh-cut foliage and stems"
+        }
+      ]
+    },
+    {
+      "id": "woody",
+      "name": "Woody",
+      "color": "#8B4513",
+      "angle": 90,
+      "description": "Warm, dry, and sophisticated wood notes",
+      "subfamilies": [
+        {
+          "id": "sandalwood",
+          "name": "Sandalwood",
+          "notes": ["sandalwood", "australian-sandalwood", "amyris"],
+          "description": "Creamy, smooth woods"
+        },
+        {
+          "id": "cedar",
+          "name": "Cedar",
+          "notes": ["cedarwood-atlas", "cedarwood-virginia", "cypress"],
+          "description": "Dry, pencil-shaving woods"
+        },
+        {
+          "id": "vetiver",
+          "name": "Vetiver",
+          "notes": ["vetiver-haiti", "vetiver-java", "vetiver-bourbon"],
+          "description": "Earthy, rooty woody notes"
+        },
+        {
+          "id": "oud",
+          "name": "Oud",
+          "notes": ["agarwood", "oud", "guaiac-wood"],
+          "description": "Dark, resinous woods"
+        }
+      ]
+    },
+    {
+      "id": "oriental",
+      "name": "Oriental",
+      "color": "#FF6347",
+      "angle": 135,
+      "description": "Warm, sensual, and exotic blends",
+      "subfamilies": [
+        {
+          "id": "amber",
+          "name": "Amber",
+          "notes": ["labdanum", "benzoin", "vanilla", "tonka-bean"],
+          "description": "Warm, resinous amber accords"
+        },
+        {
+          "id": "spicy",
+          "name": "Spicy",
+          "notes": ["cinnamon", "clove", "nutmeg", "cardamom", "black-pepper", "pink-pepper"],
+          "description": "Hot and warming spices"
+        },
+        {
+          "id": "incense",
+          "name": "Incense",
+          "notes": ["frankincense", "myrrh", "elemi", "olibanum"],
+          "description": "Smoky, ceremonial resins"
+        }
+      ]
+    },
+    {
+      "id": "fruity",
+      "name": "Fruity",
+      "color": "#FF1493",
+      "angle": 180,
+      "description": "Sweet, juicy, and playful fruit notes",
+      "subfamilies": [
+        {
+          "id": "berry",
+          "name": "Berry",
+          "notes": ["strawberry", "raspberry", "blackberry", "blackcurrant"],
+          "description": "Sweet and tart berries"
+        },
+        {
+          "id": "stone-fruit",
+          "name": "Stone Fruit",
+          "notes": ["peach", "apricot", "plum", "nectarine"],
+          "description": "Soft, fuzzy stone fruits"
+        },
+        {
+          "id": "tropical",
+          "name": "Tropical",
+          "notes": ["coconut", "mango", "passion-fruit", "pineapple", "papaya"],
+          "description": "Exotic tropical fruits"
+        }
+      ]
+    },
+    {
+      "id": "gourmand",
+      "name": "Gourmand",
+      "color": "#D2691E",
+      "angle": 225,
+      "description": "Edible, dessert-like sweet scents",
+      "subfamilies": [
+        {
+          "id": "vanilla",
+          "name": "Vanilla",
+          "notes": ["vanilla-absolute", "vanilla-madagascar", "ethyl-maltol"],
+          "description": "Sweet vanilla varieties"
+        },
+        {
+          "id": "caramel",
+          "name": "Caramel",
+          "notes": ["caramel", "burnt-sugar", "maple-syrup"],
+          "description": "Rich caramelized sugars"
+        },
+        {
+          "id": "chocolate",
+          "name": "Chocolate",
+          "notes": ["cacao", "cocoa-absolute", "dark-chocolate"],
+          "description": "Rich chocolate notes"
+        },
+        {
+          "id": "almond",
+          "name": "Almond",
+          "notes": ["bitter-almond", "marzipan", "praline"],
+          "description": "Nutty, sweet almonds"
+        }
+      ]
+    },
+    {
+      "id": "aromatic",
+      "name": "Aromatic",
+      "color": "#9370DB",
+      "angle": 270,
+      "description": "Herbal, lavender-based, and fougère accords",
+      "subfamilies": [
+        {
+          "id": "lavender",
+          "name": "Lavender",
+          "notes": ["lavender-french", "lavender-bulgarian", "lavandin"],
+          "description": "Classic lavender varieties"
+        },
+        {
+          "id": "herbal",
+          "name": "Herbal",
+          "notes": ["sage", "rosemary", "thyme", "basil", "mint"],
+          "description": "Culinary and medicinal herbs"
+        },
+        {
+          "id": "fougere",
+          "name": "Fougère",
+          "notes": ["coumarin", "oakmoss", "geranium", "lavender"],
+          "description": "Traditional fougère accord"
+        }
+      ]
+    },
+    {
+      "id": "animalic",
+      "name": "Animalic",
+      "color": "#A0522D",
+      "angle": 315,
+      "description": "Musky, leathery, and skin-like notes",
+      "subfamilies": [
+        {
+          "id": "musk",
+          "name": "Musk",
+          "notes": ["white-musk", "cashmeran", "galaxolide", "ambrettolide"],
+          "description": "Clean and synthetic musks"
+        },
+        {
+          "id": "leather",
+          "name": "Leather",
+          "notes": ["birch-tar", "leather-accord", "saffron", "styrax"],
+          "description": "Smoky leather notes"
+        },
+        {
+          "id": "ambergris",
+          "name": "Ambergris",
+          "notes": ["ambroxan", "ambergris", "ambrette"],
+          "description": "Marine animalic notes"
+        }
+      ]
+    }
+  ],
+  "compatibility": {
+    "floral": ["woody", "fresh", "fruity", "powdery"],
+    "fresh": ["floral", "citrus", "aquatic", "green"],
+    "woody": ["floral", "oriental", "spicy", "aromatic"],
+    "oriental": ["woody", "spicy", "amber", "incense"],
+    "fruity": ["floral", "fresh", "gourmand"],
+    "gourmand": ["fruity", "oriental", "vanilla"],
+    "aromatic": ["woody", "fresh", "herbal", "lavender"],
+    "animalic": ["woody", "oriental", "leather", "musk"]
+  },
+  "noteTypeSuggestions": {
+    "top": ["citrus", "fresh", "green", "herbal", "aquatic"],
+    "middle": ["floral", "fruity", "spicy"],
+    "base": ["woody", "oriental", "gourmand", "animalic", "amber"]
+  }
+}

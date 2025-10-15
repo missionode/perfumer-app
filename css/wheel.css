@@ -1,0 +1,217 @@
+/* Fragrance Wheel Styles */
+
+.wheel-svg {
+    max-width: 100%;
+    height: auto;
+}
+
+.wheel-segment {
+    cursor: pointer;
+    transition: all var(--transition-base);
+    stroke: var(--bg-card);
+    stroke-width: 2;
+}
+
+.wheel-segment:hover {
+    opacity: 0.8;
+    stroke: var(--text-primary);
+    stroke-width: 3;
+    filter: brightness(1.1);
+}
+
+.wheel-segment.selected {
+    stroke: var(--text-primary);
+    stroke-width: 4;
+    filter: brightness(1.2);
+}
+
+.wheel-text {
+    fill: var(--text-primary);
+    font-size: 12px;
+    font-weight: 600;
+    pointer-events: none;
+    text-anchor: middle;
+    user-select: none;
+}
+
+.wheel-subfamily-text {
+    fill: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 500;
+    pointer-events: none;
+    text-anchor: middle;
+    user-select: none;
+}
+
+.wheel-center {
+    fill: var(--bg-card);
+    stroke: var(--border-color);
+    stroke-width: 2;
+}
+
+.wheel-center-text {
+    fill: var(--primary);
+    font-size: 16px;
+    font-weight: 700;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    pointer-events: none;
+}
+
+/* Wheel Tooltip */
+.wheel-tooltip {
+    position: fixed;
+    background: var(--bg-card);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+    z-index: var(--z-tooltip);
+    max-width: 320px;
+    min-width: 200px;
+}
+
+.wheel-tooltip.visible {
+    opacity: 1;
+}
+
+.wheel-tooltip h4 {
+    color: var(--primary);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+}
+
+.wheel-tooltip p {
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-sm);
+}
+
+.wheel-tooltip .compatible-list {
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border-light);
+}
+
+.wheel-tooltip .compatible-list strong {
+    display: block;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+}
+
+.wheel-tooltip .compatible-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.compatible-tag {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--primary);
+    color: white;
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Wheel Legend */
+.wheel-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-xl);
+    padding: var(--spacing-lg);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+}
+
+.legend-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+/* Wheel Controls */
+.wheel-controls {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+}
+
+.wheel-zoom-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    font-size: var(--font-size-base);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.wheel-zoom-btn:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* Mini Wheel Styles */
+.mini-wheel-svg {
+    max-width: 100%;
+    height: auto;
+}
+
+.mini-wheel-segment {
+    transition: all var(--transition-base);
+    stroke: var(--bg-card);
+    stroke-width: 1;
+}
+
+.mini-wheel-segment.active {
+    stroke: var(--text-primary);
+    stroke-width: 2;
+    filter: brightness(1.2);
+}
+
+/* Responsive Wheel */
+@media (max-width: 768px) {
+    .wheel-canvas {
+        padding: var(--spacing-md);
+        min-height: 400px;
+    }
+
+    .wheel-text {
+        font-size: 10px;
+    }
+
+    .wheel-subfamily-text {
+        font-size: 8px;
+    }
+
+    .wheel-legend {
+        justify-content: center;
+    }
+}
