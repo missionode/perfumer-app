@@ -230,11 +230,9 @@ class SettingsManager {
     }
 
     async flushSampleData() {
-        const confirmed = confirm(
-            'Remove sample ingredients?\n\n' +
-            'This will delete the 20 pre-loaded sample ingredients.\n' +
-            'Your custom ingredients will NOT be affected.\n\n' +
-            'Continue?'
+        const confirmed = await toastManager.confirm(
+            'This will delete the 20 pre-loaded sample ingredients. Your custom ingredients will NOT be affected.',
+            'Remove Sample Ingredients'
         );
 
         if (!confirmed) return;
@@ -266,18 +264,17 @@ class SettingsManager {
     }
 
     async clearAllData() {
-        const confirmed = confirm(
-            'Are you sure you want to delete ALL data?\n\n' +
-            'This will permanently delete:\n' +
-            '- All ingredients\n' +
-            '- All compositions\n' +
-            '- All settings\n\n' +
-            'This action cannot be undone!'
+        const confirmed = await toastManager.confirm(
+            'This will permanently delete ALL ingredients, ALL compositions, and ALL settings. This action cannot be undone!',
+            '⚠️ Clear All Data'
         );
 
         if (!confirmed) return;
 
-        const doubleConfirm = confirm('Are you ABSOLUTELY sure? Type YES to confirm.');
+        const doubleConfirm = await toastManager.confirm(
+            'Are you ABSOLUTELY sure? This is your final warning!',
+            '⚠️ Final Confirmation'
+        );
 
         if (!doubleConfirm) return;
 

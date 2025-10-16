@@ -3,13 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Professional fragrance composition tool with interactive wheel, harmony analysis, and cost tracking">
+    <meta name="theme-color" content="#8b5cf6">
     <title>Perfumer's Organ - Digital Fragrance Composer</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Perfumer's Organ">
 
     <!-- CSS Files -->
     <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/wheel.css">
+    <link rel="stylesheet" href="css/toast.css">
 </head>
 <body>
     <!-- Header -->
@@ -20,6 +32,9 @@
                 Perfumer's Organ
             </h1>
             <div class="header-actions">
+                <button id="helpBtn" class="icon-btn" title="Tutorial & Help">
+                    <span>❓</span>
+                </button>
                 <button id="themeToggle" class="icon-btn" title="Toggle Dark Mode">
                     <span class="theme-icon">☀️</span>
                 </button>
@@ -113,6 +128,36 @@
                 <div id="wheelInfo" class="wheel-info">
                     <h3>Select a family to explore</h3>
                     <p>Click on any segment to view details and compatible notes.</p>
+                </div>
+
+                <!-- Family Ingredients Section -->
+                <div id="familyIngredients" class="family-ingredients" style="display: none;">
+                    <h3>Available Ingredients</h3>
+                    <div id="familyIngredientList" class="family-ingredient-list">
+                        <!-- Ingredients from selected family will appear here -->
+                    </div>
+                </div>
+
+                <!-- Staging Area -->
+                <div id="stagingArea" class="staging-area" style="display: none;">
+                    <div class="staging-header">
+                        <h3>Ready for Composition</h3>
+                        <div class="staging-harmony">
+                            <span class="staging-harmony-label">Harmony:</span>
+                            <span id="stagingHarmonyScore" class="staging-harmony-score">0%</span>
+                        </div>
+                    </div>
+                    <div id="stagingList" class="staging-list">
+                        <p class="empty-state">Select ingredients from families above to start composing</p>
+                    </div>
+                    <div class="staging-actions">
+                        <button class="btn btn-primary" id="createCompositionBtn" disabled>
+                            ✨ Create Composition
+                        </button>
+                        <button class="btn btn-secondary" id="clearStagingBtn">
+                            🗑️ Clear All
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -219,10 +264,30 @@
                     <div class="harmony-panel">
                         <h3>Harmony Score</h3>
                         <div class="harmony-score-container">
-                            <div class="harmony-circle">
-                                <span id="harmonyScore">0</span>
-                                <span class="harmony-percent">%</span>
-                            </div>
+                            <svg class="harmony-circle-svg" viewBox="0 0 200 200">
+                                <defs>
+                                    <linearGradient id="harmonyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1" />
+                                        <stop offset="50%" style="stop-color:#f59e0b;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                                <!-- Background circle -->
+                                <circle cx="100" cy="100" r="85" fill="none" stroke="var(--bg-tertiary)" stroke-width="12"/>
+                                <!-- Progress circle -->
+                                <circle id="harmonyCircle" cx="100" cy="100" r="85" fill="none"
+                                        stroke="url(#harmonyGradient)" stroke-width="12"
+                                        stroke-linecap="round"
+                                        stroke-dasharray="534.07"
+                                        stroke-dashoffset="534.07"
+                                        transform="rotate(-90 100 100)"
+                                        style="transition: stroke-dashoffset 1s ease, stroke 0.5s ease"/>
+                                <!-- Center text -->
+                                <text x="100" y="95" text-anchor="middle" class="harmony-score-text">
+                                    <tspan id="harmonyScore">0</tspan>
+                                </text>
+                                <text x="100" y="115" text-anchor="middle" class="harmony-percent-text">%</text>
+                            </svg>
                         </div>
                         <p id="harmonyMessage" class="harmony-message">Add ingredients to calculate harmony</p>
                     </div>
@@ -261,6 +326,21 @@
                         <h3>Composition Wheel</h3>
                         <div id="miniWheelCanvas" class="mini-wheel-canvas">
                             <!-- Mini wheel visualization -->
+                        </div>
+                    </div>
+
+                    <div class="cost-breakdown-panel">
+                        <h3>Cost Breakdown</h3>
+                        <div class="cost-chart-container">
+                            <svg id="costPieChart" class="cost-pie-chart" viewBox="0 0 200 200">
+                                <g id="pieSlices"></g>
+                                <circle cx="100" cy="100" r="40" fill="var(--bg-card)"/>
+                                <text x="100" y="95" text-anchor="middle" class="cost-total-label">Total</text>
+                                <text x="100" y="110" text-anchor="middle" class="cost-total-value" id="costTotalValue">$0.00</text>
+                            </svg>
+                        </div>
+                        <div id="costLegend" class="cost-legend">
+                            <p class="empty-state-small">Add ingredients to see cost breakdown</p>
                         </div>
                     </div>
                 </div>
@@ -420,6 +500,8 @@
     </div>
 
     <!-- JavaScript Files -->
+    <script src="js/toast.js"></script>
+    <script src="js/pwa.js"></script>
     <script src="js/db.js"></script>
     <script src="js/wheel.js"></script>
     <script src="js/organ.js"></script>
@@ -428,6 +510,7 @@
     <script src="js/theme.js"></script>
     <script src="js/export.js"></script>
     <script src="js/settings.js"></script>
+    <script src="js/tutorial.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

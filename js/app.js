@@ -152,6 +152,16 @@ class PerfumerApp {
             settingsBtn.addEventListener('click', () => this.showSettings());
         }
 
+        // Help button
+        const helpBtn = document.getElementById('helpBtn');
+        if (helpBtn) {
+            helpBtn.addEventListener('click', () => {
+                if (window.tutorialManager) {
+                    tutorialManager.start();
+                }
+            });
+        }
+
         // Search and filters (will be handled by individual modules)
     }
 
@@ -280,13 +290,35 @@ class PerfumerApp {
     }
 
     showError(message) {
-        // Simple alert for now - could be enhanced with a toast notification system
-        alert('Error: ' + message);
+        if (window.toastManager) {
+            toastManager.error(message);
+        } else {
+            alert('Error: ' + message);
+        }
     }
 
     showSuccess(message) {
-        // Simple alert for now - could be enhanced with a toast notification system
-        alert('Success: ' + message);
+        if (window.toastManager) {
+            toastManager.success(message);
+        } else {
+            alert('Success: ' + message);
+        }
+    }
+
+    showWarning(message) {
+        if (window.toastManager) {
+            toastManager.warning(message);
+        } else {
+            alert('Warning: ' + message);
+        }
+    }
+
+    showInfo(message) {
+        if (window.toastManager) {
+            toastManager.info(message);
+        } else {
+            alert(message);
+        }
     }
 
     showSettings() {

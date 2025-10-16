@@ -171,11 +171,9 @@ class OrganManager {
             const isSelected = this.selectedIngredients.has(ing.id);
 
             return `
-                <div class="ingredient-card ${isSelected ? 'selected' : ''}" data-id="${ing.id}">
-                    <input type="checkbox" class="ingredient-checkbox"
-                           data-id="${ing.id}"
-                           ${isSelected ? 'checked' : ''}
-                           onclick="organManager.toggleSelection('${ing.id}')">
+                <div class="ingredient-card ${isSelected ? 'selected' : ''}"
+                     data-id="${ing.id}"
+                     onclick="organManager.handleCardClick(event, '${ing.id}')">
                     <div class="card-header">
                         <h3 class="card-title">${this.escapeHtml(ing.name)}</h3>
                         <span class="card-badge badge-${ing.noteType}">${ing.noteType}</span>
@@ -208,10 +206,12 @@ class OrganManager {
                         ` : ''}
                     </div>
                     <div class="card-actions">
-                        <button class="btn btn-small btn-secondary" onclick="organManager.editIngredient('${ing.id}')">
+                        <button class="btn btn-small btn-secondary"
+                                onclick="event.stopPropagation(); organManager.editIngredient('${ing.id}')">
                             ✏️ Edit
                         </button>
-                        <button class="btn btn-small btn-secondary" onclick="organManager.deleteIngredient('${ing.id}')">
+                        <button class="btn btn-small btn-secondary"
+                                onclick="event.stopPropagation(); organManager.deleteIngredient('${ing.id}')">
                             🗑️ Delete
                         </button>
                     </div>
@@ -267,9 +267,12 @@ class OrganManager {
     }
 
     async deleteIngredient(id) {
-        if (!confirm('Are you sure you want to delete this ingredient?')) {
-            return;
-        }
+        const confirmed = await toastManager.confirm(
+            'Are you sure you want to delete this ingredient? This action cannot be undone.',
+            'Delete Ingredient'
+        );
+
+        if (!confirmed) return;
 
         try {
             await db.deleteIngredient(id);
@@ -426,6 +429,19 @@ class OrganManager {
     }
 
     // Multi-select methods
+    handleCardClick(event, id) {
+        // Don't toggle if clicking on buttons
+        const target = event.target;
+
+        // Check if click is on a button or inside a button
+        if (target.tagName === 'BUTTON' || target.closest('button')) {
+            return;
+        }
+
+        // Toggle selection
+        this.toggleSelection(id);
+    }
+
     toggleSelection(id) {
         if (this.selectedIngredients.has(id)) {
             this.selectedIngredients.delete(id);
@@ -474,9 +490,9 @@ class OrganManager {
             return;
         }
 
-        const confirmed = confirm(
-            `Delete ${count} ingredient${count > 1 ? 's' : ''}?\n\n` +
-            'This action cannot be undone.'
+        const confirmed = await toastManager.confirm(
+            `Delete ${count} ingredient${count > 1 ? 's' : ''}? This action cannot be undone.`,
+            'Bulk Delete'
         );
 
         if (!confirmed) return;

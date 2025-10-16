@@ -14,6 +14,22 @@ A comprehensive web application for perfumers to manage ingredients, create comp
 - Expanded subfamilies for detailed classification
 - Family compatibility visualization
 - Click segments to explore families and subfamilies
+- **Enhanced hover tooltips:**
+  - Large, readable font sizes
+  - Detailed family and subfamily information
+  - Compatible family suggestions
+  - Color-coded compatibility tags
+- **🆕 Wheel-to-Composition Workflow:**
+  - Click any family segment to view available ingredients from that family
+  - Browse ingredients by family with instant filtering
+  - **Staging area** for building compositions:
+    - Add ingredients from multiple families
+    - Real-time simplified harmony scoring
+    - Visual family indicators with color-coding
+    - Add/remove ingredients freely before committing
+  - One-click transfer to Composition Builder
+  - Confirmation dialog prevents accidental overwrites
+  - Seamless workflow from exploration to creation
 
 ### 🧪 Ingredient Organ
 - Complete ingredient library management (CRUD operations)
@@ -26,6 +42,13 @@ A comprehensive web application for perfumers to manage ingredients, create comp
   - Descriptive notes
 - Advanced filtering and search
 - Sorting by name, price, intensity, or family
+- **🆕 Enhanced selection system:**
+  - Click anywhere on ingredient card to select
+  - No checkbox clutter - clean card design
+  - Multi-select with visual highlighting
+  - Select all / Deselect all actions
+  - Bulk delete with confirmation
+  - Prevents accidental deletions with smart click handling
 - Import/Export in JSON format
 
 ### ✨ Composition Builder
@@ -67,10 +90,25 @@ A comprehensive web application for perfumers to manage ingredients, create comp
 - Edit, duplicate, or delete compositions
 - Export individual compositions
 
-### 🌓 Dark Mode
-- Toggle between light and dark themes
-- Persistent theme preference (localStorage + IndexedDB)
-- Smooth transitions
+### ⚙️ Settings & Preferences
+- **Multi-currency support:**
+  - 20+ major world currencies (USD, EUR, GBP, INR, JPY, CNY, etc.)
+  - Automatic currency symbol formatting
+  - Proper symbol positioning (prefix/suffix based on locale)
+  - Real-time price updates across all views
+- **Drops per ML configuration:**
+  - Adjustable conversion rate (15-25 drops/ML)
+  - Default: 20 drops per ML
+  - Applies to all composition calculations
+- **Theme selection:**
+  - Light and dark mode toggle
+  - Persistent preference (localStorage + IndexedDB)
+  - Smooth theme transitions
+- **Data management:**
+  - Export all data (full database backup)
+  - Import full database from JSON
+  - Flush sample data (removes pre-loaded samples only)
+  - Clear all data with double confirmation
 
 ### 💾 Data Management
 - **IndexedDB for local persistence** (offline-first)
@@ -109,6 +147,7 @@ perfumer-app/
 │   ├── composer.js         # Composition builder + library
 │   ├── lucky.js            # Random generator
 │   ├── theme.js            # Theme management
+│   ├── settings.js         # Settings & preferences
 │   └── export.js           # Import/export utilities
 ├── data/
 │   ├── default-wheel.json  # Fragrance wheel data
@@ -140,6 +179,8 @@ perfumer-app/
 
 #### Creating a Composition
 
+**Method 1: Direct Composition Builder**
+
 1. Navigate to the **Compose** tab
 2. Enter a composition name
 3. Choose measurement mode (Drops or ML)
@@ -147,6 +188,20 @@ perfumer-app/
 5. Adjust amounts using +/- buttons
 6. Monitor harmony score and note balance
 7. Click **"Save Composition"** when satisfied
+
+**Method 2: 🆕 Wheel-Based Composition (NEW!)**
+
+1. Navigate to the **Wheel** tab
+2. Click any **family segment** (outer ring) on the fragrance wheel
+3. View all ingredients available in that family below the wheel
+4. Click **"+ Add"** on ingredients you want to use
+5. Selected ingredients appear in the **"Ready for Composition"** staging area
+6. **Repeat** for multiple families (mix and match!)
+7. Watch the **harmony score** update in real-time
+8. Remove ingredients using the **"Remove"** button if needed
+9. Click **"✨ Create Composition"** when ready
+10. System transfers to Compose tab with all selected ingredients
+11. Fine-tune quantities, adjust ratios, and save
 
 #### Using "Feeling Lucky"
 
@@ -167,8 +222,30 @@ perfumer-app/
 - Library tab → **"Export All"** → Full backup
 - Compose tab → **"Export"** → Current composition as JSON
 
+**Full Database:**
+- Settings → **"Export All Data"** → Complete database backup with metadata
+
 **Scaled Recipes:**
 - In Compose tab, create custom scaling for production volumes
+
+#### Managing Settings
+
+1. Click the **⚙️ Settings** button (top navigation)
+2. **Change Currency:**
+   - Select from 20+ supported currencies
+   - Click "Save Settings"
+   - All prices update immediately
+3. **Adjust Drops per ML:**
+   - Set between 15-25 drops per ML
+   - Matches your specific materials and equipment
+4. **Change Theme:**
+   - Click Light or Dark theme button
+   - Theme switches instantly
+5. **Data Management:**
+   - **Flush Sample Data:** Removes 20 pre-loaded samples only
+   - **Export All Data:** Full backup with timestamp
+   - **Import Data:** Restore from backup file
+   - **Clear All Data:** Nuclear option (requires double confirmation)
 
 ## Fragrance Wheel Structure
 
@@ -196,8 +273,22 @@ The system includes a built-in compatibility matrix that suggests which families
 
 ## Drop Conversion
 
-- **Standard:** 1 drop = 0.05 ML (20 drops per ML)
-- Note: Actual drop size varies by viscosity; this is a standard approximation
+- **Default:** 1 drop = 0.05 ML (20 drops per ML)
+- **Configurable:** Adjustable from 15-25 drops per ML in Settings
+- Note: Actual drop size varies by viscosity; adjust in settings for your specific materials
+
+## Currency Support
+
+### Supported Currencies
+
+USD ($), EUR (€), GBP (£), JPY (¥), CNY (¥), INR (₹), AUD ($), CAD ($), CHF (Fr), SEK (kr), NOK (kr), DKK (kr), SGD ($), HKD ($), NZD ($), KRW (₩), MXN ($), BRL (R$), ZAR (R), RUB (₽)
+
+### Formatting Rules
+
+- **Prefix currencies:** USD, EUR, GBP, INR, etc. → `$10.50`, `€10.50`, `₹10.50`
+- **Suffix currencies:** SEK, NOK, DKK → `10.50 kr`
+- All prices display with 2 decimal places
+- Currency changes update all prices throughout the application instantly
 
 ## Browser Compatibility
 
@@ -205,6 +296,23 @@ The system includes a built-in compatibility matrix that suggests which families
 - Firefox
 - Safari
 - Any modern browser with IndexedDB support
+
+## Key Features Summary
+
+✅ **Offline-first** - Works completely offline with IndexedDB
+✅ **Multi-currency** - 20+ currencies with proper formatting
+✅ **Card-based selection** - Click anywhere on cards to select (no checkbox clutter)
+✅ **Bulk operations** - Select and delete multiple ingredients
+✅ **Dark mode** - Full theme support with persistence
+✅ **Sample data** - 20 pre-loaded ingredients to get started
+✅ **Enhanced tooltips** - Large, readable wheel segment information (centered display)
+✅ **Configurable drops** - Adjust conversion rate to match your materials
+✅ **Real-time calculations** - Automatic cost, harmony, and balance updates
+✅ **Version control** - Track composition iterations
+✅ **Random generator** - AI-assisted "Feeling Lucky" compositions
+✅ **🆕 Wheel-to-composition workflow** - Build compositions directly from fragrance wheel
+✅ **🆕 Staging area** - Pre-compose with real-time harmony scoring
+✅ **🆕 Multi-family mixing** - Select ingredients from multiple families before committing
 
 ## Future Enhancements
 
@@ -216,6 +324,8 @@ The system includes a built-in compatibility matrix that suggests which families
 - Advanced analytics and insights
 - Custom fragrance wheel creation
 - Aroma chemical database integration
+- Batch calculator for production scaling
+- Mobile app (PWA)
 
 ## License
 

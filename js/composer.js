@@ -141,6 +141,7 @@ class Composer {
         this.calculateBalance();
         this.calculateHarmony();
         this.updateMiniWheel();
+        this.updateCostBreakdown();
     }
 
     renderFormula() {
@@ -334,16 +335,242 @@ class Composer {
     }
 
     updateHarmonyCircle(score) {
-        const circle = document.querySelector('.harmony-circle');
+        const circle = document.getElementById('harmonyCircle');
         if (!circle) return;
 
-        const gradient = `conic-gradient(var(--primary) ${score}%, var(--bg-tertiary) ${score}%)`;
-        circle.style.background = gradient;
+        // Calculate the stroke-dashoffset for the progress
+        // Circumference = 2 * PI * radius = 2 * PI * 85 = 534.07
+        const circumference = 534.07;
+        const offset = circumference - (score / 100) * circumference;
+
+        // Animate the circle
+        circle.style.strokeDashoffset = offset;
+
+        // Update gradient based on score (low = red, medium = yellow, high = green)
+        const gradient = document.getElementById('harmonyGradient');
+        if (gradient) {
+            if (score < 60) {
+                // Low harmony: red to orange
+                gradient.innerHTML = `
+                    <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#f97316;stop-opacity:1" />
+                `;
+            } else if (score < 75) {
+                // Medium harmony: orange to yellow
+                gradient.innerHTML = `
+                    <stop offset="0%" style="stop-color:#f97316;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#eab308;stop-opacity:1" />
+                `;
+            } else if (score < 90) {
+                // Good harmony: yellow to green
+                gradient.innerHTML = `
+                    <stop offset="0%" style="stop-color:#eab308;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#22c55e;stop-opacity:1" />
+                `;
+            } else {
+                // Excellent harmony: green gradient
+                gradient.innerHTML = `
+                    <stop offset="0%" style="stop-color:#22c55e;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
+                `;
+            }
+        }
+
+        // Animate the number with counting effect
+        const harmonyText = document.getElementById('harmonyScore');
+        if (harmonyText) {
+            const currentScore = parseInt(harmonyText.textContent) || 0;
+            this.animateNumber(harmonyText, currentScore, score, 800);
+        }
+    }
+
+    animateNumber(element, start, end, duration) {
+        const startTime = performance.now();
+        const difference = end - start;
+
+        const updateNumber = (currentTime) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            // Easing function for smooth animation
+            const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+            const current = Math.round(start + difference * easeOutQuart);
+
+            element.textContent = current;
+
+            if (progress < 1) {
+                requestAnimationFrame(updateNumber);
+            }
+        };
+
+        requestAnimationFrame(updateNumber);
     }
 
     updateMiniWheel() {
         if (window.wheelRenderer) {
             wheelRenderer.renderMiniWheel('miniWheelCanvas', this.formula.map(item => item.ingredient));
+        }
+    }
+
+    updateCostBreakdown() {
+        const pieSlices = document.getElementById('pieSlices');
+        const costLegend = document.getElementById('costLegend');
+        const costTotalValue = document.getElementById('costTotalValue');
+
+        if (!pieSlices || !costLegend || !costTotalValue) return;
+
+        // Calculate cost data for each ingredient
+        const costData = this.formula.map(item => ({
+            name: item.ingredient.name,
+            cost: this.calculateItemCost(item),
+            ingredient: item.ingredient
+        })).sort((a, b) => b.cost - a.cost); // Sort by cost descending
+
+        const totalCost = costData.reduce((sum, item) => sum + item.cost, 0);
+
+        // Update total cost display
+        costTotalValue.textContent = app.formatPrice(totalCost);
+
+        // Clear previous chart
+        pieSlices.innerHTML = '';
+
+        if (costData.length === 0) {
+            costLegend.innerHTML = '<p class="empty-state-small">Add ingredients to see cost breakdown</p>';
+            return;
+        }
+
+        // Define color palette - vibrant and distinct colors
+        const colors = [
+            '#8b5cf6', // Purple
+            '#ec4899', // Pink
+            '#f59e0b', // Amber
+            '#10b981', // Emerald
+            '#3b82f6', // Blue
+            '#ef4444', // Red
+            '#06b6d4', // Cyan
+            '#f97316', // Orange
+            '#84cc16', // Lime
+            '#a855f7', // Violet
+            '#14b8a6', // Teal
+            '#f43f5e'  // Rose
+        ];
+
+        // Calculate pie slices
+        let currentAngle = 0;
+        const radius = 85;
+        const center = 100;
+
+        const slices = costData.map((item, index) => {
+            const percentage = (item.cost / totalCost) * 100;
+            const angle = (item.cost / totalCost) * 360;
+            const color = colors[index % colors.length];
+
+            // Calculate SVG path for pie slice
+            const startAngle = currentAngle;
+            const endAngle = currentAngle + angle;
+
+            // Convert angles to radians
+            const startRad = (startAngle - 90) * Math.PI / 180;
+            const endRad = (endAngle - 90) * Math.PI / 180;
+
+            // Calculate points
+            const x1 = center + radius * Math.cos(startRad);
+            const y1 = center + radius * Math.sin(startRad);
+            const x2 = center + radius * Math.cos(endRad);
+            const y2 = center + radius * Math.sin(endRad);
+
+            // Determine if large arc flag
+            const largeArc = angle > 180 ? 1 : 0;
+
+            // Create path
+            const path = `M ${center} ${center} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+
+            currentAngle += angle;
+
+            return {
+                path,
+                color,
+                name: item.name,
+                cost: item.cost,
+                percentage
+            };
+        });
+
+        // Render pie slices with animation
+        slices.forEach((slice, index) => {
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', slice.path);
+            path.setAttribute('fill', slice.color);
+            path.setAttribute('class', 'pie-slice');
+            path.setAttribute('data-index', index);
+
+            // Add animation
+            path.style.opacity = '0';
+            path.style.transition = `opacity 0.3s ease ${index * 0.05}s`;
+
+            // Tooltip on hover
+            path.addEventListener('mouseenter', (e) => {
+                const rect = e.target.getBoundingClientRect();
+                this.showCostTooltip(slice, rect);
+            });
+
+            path.addEventListener('mouseleave', () => {
+                this.hideCostTooltip();
+            });
+
+            pieSlices.appendChild(path);
+
+            // Trigger animation
+            setTimeout(() => {
+                path.style.opacity = '1';
+            }, 10);
+        });
+
+        // Render legend
+        costLegend.innerHTML = slices.map(slice => `
+            <div class="cost-legend-item">
+                <div class="cost-legend-color" style="background: ${slice.color}"></div>
+                <span class="cost-legend-name" title="${this.escapeHtml(slice.name)}">${this.escapeHtml(slice.name)}</span>
+                <span class="cost-legend-percent">${slice.percentage.toFixed(1)}%</span>
+                <span class="cost-legend-value">${app.formatPrice(slice.cost)}</span>
+            </div>
+        `).join('');
+    }
+
+    showCostTooltip(slice, rect) {
+        // Remove existing tooltip
+        this.hideCostTooltip();
+
+        const tooltip = document.createElement('div');
+        tooltip.id = 'costTooltip';
+        tooltip.style.position = 'fixed';
+        tooltip.style.left = rect.left + rect.width / 2 + 'px';
+        tooltip.style.top = rect.top - 10 + 'px';
+        tooltip.style.transform = 'translate(-50%, -100%)';
+        tooltip.style.background = 'var(--bg-card)';
+        tooltip.style.border = '1px solid var(--border-color)';
+        tooltip.style.borderRadius = 'var(--radius-md)';
+        tooltip.style.padding = 'var(--spacing-sm) var(--spacing-md)';
+        tooltip.style.boxShadow = 'var(--shadow-md)';
+        tooltip.style.zIndex = '1000';
+        tooltip.style.pointerEvents = 'none';
+        tooltip.style.fontSize = 'var(--font-size-sm)';
+        tooltip.style.whiteSpace = 'nowrap';
+
+        tooltip.innerHTML = `
+            <div style="font-weight: 600; margin-bottom: 4px;">${this.escapeHtml(slice.name)}</div>
+            <div style="color: var(--text-secondary);">
+                ${app.formatPrice(slice.cost)} (${slice.percentage.toFixed(1)}%)
+            </div>
+        `;
+
+        document.body.appendChild(tooltip);
+    }
+
+    hideCostTooltip() {
+        const tooltip = document.getElementById('costTooltip');
+        if (tooltip) {
+            tooltip.remove();
         }
     }
 

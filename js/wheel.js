@@ -4,15 +4,20 @@ class WheelRenderer {
         this.canvasId = canvasId;
         this.wheelData = null;
         this.selectedFamily = null;
+        this.selectedFamilies = new Set(); // Track multiple selected families
+        this.stagingIngredients = []; // Ingredients ready for composition
         this.svgNS = 'http://www.w3.org/2000/svg';
         this.centerX = 300;
         this.centerY = 300;
         this.outerRadius = 250;
         this.innerRadius = 80;
         this.middleRadius = 165;
+        this.init();
     }
 
     async init() {
+        this.attachEventListeners();
+
         // Wait for app to be ready
         if (!window.app || !app.fragranceWheel) {
             console.log('Waiting for app to initialize...');
@@ -26,6 +31,20 @@ class WheelRenderer {
             return;
         }
         console.log('Wheel data loaded:', this.wheelData.families.length, 'families');
+    }
+
+    attachEventListeners() {
+        // Create Composition button
+        const createBtn = document.getElementById('createCompositionBtn');
+        if (createBtn) {
+            createBtn.addEventListener('click', () => this.transferToComposer());
+        }
+
+        // Clear Staging button
+        const clearBtn = document.getElementById('clearStagingBtn');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => this.clearStaging());
+        }
     }
 
     render() {
@@ -221,8 +240,20 @@ class WheelRenderer {
         svg.appendChild(textElement);
     }
 
-    onSegmentClick(data, type) {
-        this.selectedFamily = data.id;
+    async onSegmentClick(data, type) {
+        let familyId;
+
+        if (type === 'family') {
+            familyId = data.id;
+            this.selectedFamily = familyId;
+        } else if (type === 'subfamily') {
+            // For subfamily, use parent family
+            familyId = data.parentFamily.id;
+            this.selectedFamily = familyId;
+        }
+
+        // Add to selected families set
+        this.selectedFamilies.add(familyId);
 
         // Update info panel
         const infoPanel = document.getElementById('wheelInfo');
@@ -275,6 +306,12 @@ class WheelRenderer {
         }
 
         infoPanel.innerHTML = html;
+
+        // Show family ingredients
+        await this.showFamilyIngredients(familyId);
+
+        // Show staging area
+        this.showStagingArea();
     }
 
     onSegmentHover(event, data, type) {
@@ -327,12 +364,22 @@ class WheelRenderer {
 
         tooltip.innerHTML = content;
 
-        // Position tooltip near mouse
-        const x = event.clientX + 15;
-        const y = event.clientY + 15;
+        // Get canvas element and its center position
+        const canvas = document.getElementById(this.canvasId);
+        if (canvas) {
+            const rect = canvas.getBoundingClientRect();
 
-        tooltip.style.left = x + 'px';
-        tooltip.style.top = y + 'px';
+            // Calculate center of canvas
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            // Position tooltip at center, accounting for tooltip size
+            // We need to offset by half the tooltip width/height to truly center it
+            tooltip.style.left = centerX + 'px';
+            tooltip.style.top = centerY + 'px';
+            tooltip.style.transform = 'translate(-50%, -50%)';
+        }
+
         tooltip.classList.add('visible');
 
         // Track mouse movement
@@ -439,6 +486,230 @@ class WheelRenderer {
         svg.appendChild(centerCircle);
 
         canvas.appendChild(svg);
+    }
+
+    // Staging Area Methods
+    async showFamilyIngredients(familyId) {
+        const familyIngredientsSection = document.getElementById('familyIngredients');
+        const familyIngredientList = document.getElementById('familyIngredientList');
+
+        if (!familyIngredientsSection || !familyIngredientList) return;
+
+        // Get all ingredients from organ
+        const allIngredients = await db.getAllIngredients();
+
+        // Filter by family
+        const familyIngredients = allIngredients.filter(ing => ing.family === familyId);
+
+        if (familyIngredients.length === 0) {
+            familyIngredientList.innerHTML = '<p class="empty-state">No ingredients available in this family</p>';
+            familyIngredientsSection.style.display = 'block';
+            return;
+        }
+
+        // Render ingredients
+        familyIngredientList.innerHTML = familyIngredients.map(ing => {
+            const isInStaging = this.stagingIngredients.some(s => s.id === ing.id);
+            return `
+                <div class="family-ingredient-item" data-id="${ing.id}">
+                    <div class="family-ingredient-info">
+                        <div class="family-ingredient-name">${this.escapeHtml(ing.name)}</div>
+                        <div class="family-ingredient-meta">
+                            ${ing.noteType} • Intensity: ${ing.intensity}/10
+                        </div>
+                    </div>
+                    <button class="family-ingredient-add"
+                            ${isInStaging ? 'disabled' : ''}
+                            onclick="wheelRenderer.addToStaging('${ing.id}')">
+                        ${isInStaging ? 'Added' : '+ Add'}
+                    </button>
+                </div>
+            `;
+        }).join('');
+
+        familyIngredientsSection.style.display = 'block';
+    }
+
+    async addToStaging(ingredientId) {
+        // Get ingredient data
+        const ingredient = await db.get('ingredients', ingredientId);
+        if (!ingredient) return;
+
+        // Check if already in staging
+        if (this.stagingIngredients.some(s => s.id === ingredientId)) {
+            return;
+        }
+
+        // Add to staging
+        this.stagingIngredients.push(ingredient);
+
+        // Update displays
+        this.renderStagingList();
+        this.calculateStagingHarmony();
+
+        // Refresh family ingredients to update buttons
+        if (this.selectedFamily) {
+            await this.showFamilyIngredients(this.selectedFamily);
+        }
+    }
+
+    removeFromStaging(ingredientId) {
+        // Remove from staging array
+        this.stagingIngredients = this.stagingIngredients.filter(ing => ing.id !== ingredientId);
+
+        // Update displays
+        this.renderStagingList();
+        this.calculateStagingHarmony();
+
+        // Refresh family ingredients to update buttons
+        if (this.selectedFamily) {
+            this.showFamilyIngredients(this.selectedFamily);
+        }
+    }
+
+    showStagingArea() {
+        const stagingArea = document.getElementById('stagingArea');
+        if (stagingArea) {
+            stagingArea.style.display = 'block';
+        }
+        this.renderStagingList();
+    }
+
+    renderStagingList() {
+        const stagingList = document.getElementById('stagingList');
+        const createBtn = document.getElementById('createCompositionBtn');
+
+        if (!stagingList) return;
+
+        if (this.stagingIngredients.length === 0) {
+            stagingList.innerHTML = '<p class="empty-state">Select ingredients from families above to start composing</p>';
+            if (createBtn) createBtn.disabled = true;
+            return;
+        }
+
+        stagingList.innerHTML = this.stagingIngredients.map(ing => {
+            const familyColor = app.getFamilyColor(ing.family);
+            const familyName = app.getFamilyName(ing.family);
+
+            return `
+                <div class="staging-item" data-id="${ing.id}">
+                    <div class="staging-item-info">
+                        <div class="staging-item-family-indicator" style="background: ${familyColor};"></div>
+                        <div class="staging-item-details">
+                            <div class="staging-item-name">${this.escapeHtml(ing.name)}</div>
+                            <div class="staging-item-meta">
+                                ${familyName} • ${ing.noteType} • ${ing.intensity}/10
+                            </div>
+                        </div>
+                    </div>
+                    <button class="staging-item-remove" onclick="wheelRenderer.removeFromStaging('${ing.id}')">
+                        Remove
+                    </button>
+                </div>
+            `;
+        }).join('');
+
+        if (createBtn) createBtn.disabled = false;
+    }
+
+    calculateStagingHarmony() {
+        const harmonyScoreEl = document.getElementById('stagingHarmonyScore');
+        if (!harmonyScoreEl) return;
+
+        if (this.stagingIngredients.length === 0) {
+            harmonyScoreEl.textContent = '0%';
+            return;
+        }
+
+        // Simplified harmony calculation
+        // Count families present
+        const familiesUsed = new Set(this.stagingIngredients.map(ing => ing.family));
+
+        if (familiesUsed.size === 1) {
+            // Single family = good harmony
+            harmonyScoreEl.textContent = '85%';
+            return;
+        }
+
+        // Check compatibility between families
+        let compatibilityScore = 0;
+        let comparisons = 0;
+
+        const familiesArray = Array.from(familiesUsed);
+        for (let i = 0; i < familiesArray.length; i++) {
+            for (let j = i + 1; j < familiesArray.length; j++) {
+                comparisons++;
+                const compatible = app.getCompatibleFamilies(familiesArray[i]);
+                if (compatible.includes(familiesArray[j])) {
+                    compatibilityScore++;
+                }
+            }
+        }
+
+        const harmonyPercent = comparisons > 0 ? Math.round((compatibilityScore / comparisons) * 100) : 50;
+        harmonyScoreEl.textContent = `${harmonyPercent}%`;
+    }
+
+    async clearStaging() {
+        if (this.stagingIngredients.length === 0) return;
+
+        const confirmed = await toastManager.confirm(
+            'Clear all selected ingredients from staging area?',
+            'Clear Staging'
+        );
+
+        if (!confirmed) return;
+
+        this.stagingIngredients = [];
+        this.renderStagingList();
+        this.calculateStagingHarmony();
+
+        // Refresh family ingredients if any family is selected
+        if (this.selectedFamily) {
+            this.showFamilyIngredients(this.selectedFamily);
+        }
+    }
+
+    async transferToComposer() {
+        if (this.stagingIngredients.length === 0) return;
+
+        // Check if composer has existing ingredients
+        if (window.composer && composer.formula.length > 0) {
+            const confirmed = await toastManager.confirm(
+                'The composition builder already has ingredients. Do you want to replace them with the staged ingredients?',
+                'Replace Composition'
+            );
+
+            if (!confirmed) return;
+        }
+
+        // Switch to compose tab
+        app.switchTab('compose');
+
+        // Transfer ingredients to composer
+        if (window.composer) {
+            // Clear existing composition
+            composer.clearComposition();
+
+            // Add each staged ingredient
+            for (const ingredient of this.stagingIngredients) {
+                await composer.addIngredientToFormula(ingredient);
+            }
+
+            app.showSuccess(`Added ${this.stagingIngredients.length} ingredients to composition`);
+
+            // Clear staging
+            this.stagingIngredients = [];
+            this.renderStagingList();
+            this.calculateStagingHarmony();
+        }
+    }
+
+    escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 }
 

@@ -166,6 +166,7 @@
     padding: var(--spacing-lg);
     transition: all var(--transition-base);
     cursor: pointer;
+    user-select: none;
 }
 
 .ingredient-card:hover,
@@ -173,6 +174,10 @@
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
     border-color: var(--primary);
+}
+
+.ingredient-card:active {
+    transform: translateY(0);
 }
 
 .card-header {
@@ -607,13 +612,19 @@
 /* Ingredient card checkbox */
 .ingredient-checkbox {
     position: absolute;
-    bottom: var(--spacing-md);
+    top: var(--spacing-md);
     right: var(--spacing-md);
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     cursor: pointer;
     z-index: 10;
     accent-color: var(--primary);
+    opacity: 0.7;
+    transition: opacity var(--transition-base);
+}
+
+.ingredient-checkbox:hover {
+    opacity: 1;
 }
 
 .ingredient-card {
@@ -622,8 +633,38 @@
 
 .ingredient-card.selected {
     border-color: var(--primary);
-    background: rgba(139, 92, 246, 0.05);
+    background: rgba(139, 92, 246, 0.08);
     box-shadow: 0 0 0 2px var(--primary);
+}
+
+.ingredient-card.selected .ingredient-checkbox {
+    opacity: 1;
+}
+
+.card-actions {
+    position: relative;
+    z-index: 15;
+}
+
+.card-actions button {
+    pointer-events: all;
+    cursor: pointer;
+}
+
+/* Selection hint */
+.ingredient-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-lg);
+    opacity: 0;
+    background: rgba(139, 92, 246, 0.03);
+    transition: opacity var(--transition-base);
+    pointer-events: none;
+}
+
+.ingredient-card:hover::before {
+    opacity: 1;
 }
 
 /* Form helpers */

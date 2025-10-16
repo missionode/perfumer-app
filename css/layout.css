@@ -319,7 +319,8 @@
 /* Right Panel */
 .harmony-panel,
 .balance-panel,
-.mini-wheel {
+.mini-wheel,
+.cost-breakdown-panel {
     background: var(--bg-card);
     padding: var(--spacing-xl);
     border-radius: var(--radius-lg);
@@ -328,7 +329,8 @@
 
 .harmony-panel h3,
 .balance-panel h3,
-.mini-wheel h3 {
+.mini-wheel h3,
+.cost-breakdown-panel h3 {
     margin-bottom: var(--spacing-lg);
     text-align: center;
     font-size: var(--font-size-lg);
@@ -338,48 +340,35 @@
     display: flex;
     justify-content: center;
     margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-lg);
 }
 
-.harmony-circle {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background: conic-gradient(var(--primary) 0%, var(--bg-tertiary) 0%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
+.harmony-circle-svg {
+    width: 200px;
+    height: 200px;
+    filter: drop-shadow(0 4px 12px rgba(139, 92, 246, 0.2));
 }
 
-.harmony-circle::before {
-    content: '';
-    position: absolute;
-    width: 110px;
-    height: 110px;
-    background: var(--bg-card);
-    border-radius: 50%;
-}
-
-.harmony-circle span {
-    position: relative;
-    z-index: 1;
-}
-
-#harmonyScore {
-    font-size: var(--font-size-3xl);
+.harmony-score-text {
+    font-size: 48px;
     font-weight: 700;
-    color: var(--primary);
+    fill: var(--text-primary);
+    font-family: var(--font-family);
 }
 
-.harmony-percent {
-    font-size: var(--font-size-xl);
-    color: var(--text-secondary);
+.harmony-percent-text {
+    font-size: 24px;
+    font-weight: 600;
+    fill: var(--text-secondary);
+    font-family: var(--font-family);
 }
 
 .harmony-message {
     text-align: center;
     color: var(--text-secondary);
     font-size: var(--font-size-sm);
+    line-height: 1.6;
+    padding: 0 var(--spacing-md);
 }
 
 /* Library Layout */
@@ -455,4 +444,97 @@
     .app-title {
         font-size: var(--font-size-xl);
     }
+}
+
+/* Cost Breakdown Panel */
+.cost-chart-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+}
+
+.cost-pie-chart {
+    width: 200px;
+    height: 200px;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+}
+
+.cost-total-label {
+    font-size: 12px;
+    font-weight: 500;
+    fill: var(--text-secondary);
+    font-family: var(--font-family);
+}
+
+.cost-total-value {
+    font-size: 16px;
+    font-weight: 700;
+    fill: var(--primary);
+    font-family: var(--font-family);
+}
+
+.cost-legend {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.cost-legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
+    transition: all var(--transition-base);
+}
+
+.cost-legend-item:hover {
+    background: var(--bg-tertiary);
+    transform: translateX(4px);
+}
+
+.cost-legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: var(--radius-xs);
+    flex-shrink: 0;
+}
+
+.cost-legend-name {
+    flex: 1;
+    font-weight: 500;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cost-legend-value {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.cost-legend-percent {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+}
+
+.empty-state-small {
+    text-align: center;
+    color: var(--text-tertiary);
+    font-size: var(--font-size-sm);
+    font-style: italic;
+    padding: var(--spacing-md);
+}
+
+.pie-slice {
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+}
+
+.pie-slice:hover {
+    opacity: 0.8;
 }
